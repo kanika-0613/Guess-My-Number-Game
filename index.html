@@ -1,48 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Guess My Number</title>
+
     <style>
-        body{
-            font: sans-serif;
-            background-color: #222;
-            color: #fff;
-            text-align: center;
+        * {
+            box-sizing: border-box;
         }
-        .number{
-            font-size: 6rem;
-            width: 15rem;
-            margin: 20px auto;
-            background-color: #eee;
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.7rem;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            opacity: 0.75;
+        }
+
+        .difficulty-section {
+            margin-bottom: 20px;
+        }
+
+        .difficulty-section p {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .difficulty {
+            padding: 9px 18px;
+            margin: 4px;
+            border: none;
+            border-radius: 8px;
+            background: white;
             color: #222;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: 0.2s;
         }
-        .message,.score,.highscore{
-            font-size: 2rem;
+
+        .difficulty:hover {
+            transform: translateY(-2px);
         }
-        input{
-            width: 50px;
-            font-size: 2rem;
+
+        .difficulty.selected {
+            background: #00c6ff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 198, 255, 0.4);
+        }
+
+        .message {
+            min-height: 25px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .number {
+            width: 130px;
+            height: 100px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            color: #222;
+            border-radius: 15px;
+            font-size: 3.5rem;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .guess {
+            width: 90px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            font-size: 1.4rem;
             text-align: center;
         }
-        button{
-            font-size: 1.2rem;
+
+        .check {
             padding: 10px 20px;
-            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #00c6ff;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .check:hover {
+            transform: translateY(-2px);
+        }
+
+        .again {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #ffcc70;
+            color: #222;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .again:hover {
+            transform: translateY(-2px);
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin-top: 25px;
+            font-size: 1rem;
+        }
+
+        .score-section strong {
+            font-size: 1.2rem;
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .confetti {
+            position: absolute;
+            top: -20px;
+            width: 10px;
+            height: 16px;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .win-animation {
+            animation: winPop 0.6s ease;
+        }
+
+        @keyframes winPop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                width: 92%;
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .number {
+                width: 115px;
+                height: 90px;
+                font-size: 3rem;
+            }
+
+            .difficulty {
+                padding: 8px 13px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <h1>Guess My Number</h1>
-    <p class="message">Start Guessing...</p>
-    <div class="number">?</div>
-    <input tyoe="number" class="guess"/><br><br>
-    <button class="check">Check!</button>
-    <button class="again">Again!</button>
-    <p>Score:<span class="score">20</span></p>
-    <p>Highscore:<span class="highscore">0</span></p>
+
+    <div class="confetti-container"></div>
+
+    <div class="game-container">
+
+        <h1>Guess My Number !</h1>
+
+        <p class="subtitle">Can you guess the secret number?</p>
+
+        <div class="difficulty-section">
+
+            <p>Choose Difficulty</p>
+
+            <button class="difficulty easy">Easy</button>
+            <button class="difficulty medium">Medium</button>
+            <button class="difficulty hard">Hard</button>
+
+        </div>
+
+        <p class="message">Choose a difficulty to start...</p>
+
+        <div class="number">?</div>
+
+        <div class="input-section">
+
+            <input type="number" class="guess" placeholder="?">
+
+            <button class="check">Check</button>
+
+        </div>
+
+        <button class="again">↻ Again</button>
+
+        <div class="score-section">
+
+            <span>Score: <strong class="score">0</strong></span>
+
+            <span>Best: <strong class="highscore">0</strong></span>
+
+        </div>
+
+    </div>
+
     <script src="game.js"></script>
+
 </body>
+
 </html>
